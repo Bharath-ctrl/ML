@@ -42,5 +42,473 @@
                         G=['?']*num_attributes
                 print(" For training example no :{0} the hypothesisis S{0}".format(i+1),S)
                 print("For training example no:{0} the hypothesis is G{0}".format(i+1),temp)</p>
+    <h2>p-1</h2>
+    <p>def aStarAlgo(start_node, stop_node):
+    open_set = set(start_node)
+    print("This is open_set",open_set)
+    closed_set = set()
+    print("Closed_set is",closed_set)
+    g = {}
+    parents = {}
+    g[start_node] = 0
+    parents[start_node] = start_node
+    while len(open_set) > 0:
+        n = None
+        for v in open_set:
+            if n == None or g[v] + heuristic(v) < g[n] + heuristic(n):
+                n = v
+        if n == stop_node or Graph_nodes[n] == None:
+            pass
+        else:
+            for (m, weight) in get_neighbors(n):
+                if m not in open_set and m not in closed_set:
+                    open_set.add(m)
+                    parents[m] = n
+                    g[m] = g[n] + weight
+                else:
+                    if g[m] > g[n] + weight:
+                        g[m] = g[n] + weight
+                        parents[m] = n
+                        if m in closed_set:
+                            closed_set.remove(m)
+                            open_set.add(m)
+        if n == None:
+            print('Path does not exist!')
+            return None
+        if n == stop_node:
+            path = []
+            while parents[n] != n:
+                path.append(n)
+                n = parents[n]
+            path.append(start_node)
+            path.reverse()
+            print('Path found: {}'.format(path))
+            return path
+        open_set.remove(n)
+        closed_set.add(n)
+        print("n is",n)
+    return None
+
+def get_neighbors(v):
+    if v in Graph_nodes:
+        return Graph_nodes[v]
+    else:
+        return None
+    
+def heuristic(n):
+    H_dist = {
+    'A': 4,
+    'B': 3,
+    'C': 1,
+    'D': 0,
+ }
+    return H_dist[n]
+#Describe your graph here
+Graph_nodes = {
+ 'A': [('B', 3), ('C', 4)],
+ 'B': [('D', 2)],
+ 'C': [('D',1)],
+ 'D':None
+ }
+aStarAlgo('A', 'D')<p/>
+        
+        <h2>p-2</h2>
+        <p>
+class Graph:
+    def __init__(self, graph, heuristicNodeList, startNode): 
+        self.graph = graph
+        self.H = heuristicNodeList
+        self.start = startNode
+        self.parent = {}
+        self.status = {}
+        self.solutionGraph = {}
+
+    def applyAOStar(self):
+        self.aoStar(self.start, False)
+
+    def getNeighbors(self, v):
+        return self.graph.get(v, '')
+
+    def getStatus(self, v):
+        return self.status.get(v, 0)
+
+    def setStatus(self, v, val):
+        self.status[v] = val
+
+    def getHeuristicNodeValue(self, n):
+        return self.H.get(n, 0)
+
+    def setHeuristicNodeValue(self, n, value):
+        self.H[n] = value
+
+    def printSolution(self):
+        print("FOR GRAPH SOLUTION, TRAVERSE THE GRAPH FROM THE START NODE:", self.start)
+        print("------------------------------------------------------------")
+        print(self.solutionGraph)
+        print("------------------------------------------------------------")
+
+    def computeMinimumCostChildNodes(self, v): 
+        minimumCost = 0
+        costToChildNodeListDict = {}
+        costToChildNodeListDict[minimumCost] = []
+        flag = True
+        for nodeInfoTupleList in self.getNeighbors(v):
+            cost = 0
+            nodeList = []
+            for c, weight in nodeInfoTupleList:
+                cost = cost + self.getHeuristicNodeValue(c) + weight
+                nodeList.append(c)
+
+            if flag == True:
+                minimumCost = cost
+                costToChildNodeListDict[minimumCost] = nodeList
+                flag = False
+            else:
+                if minimumCost > cost:
+                    minimumCost = cost
+                    costToChildNodeListDict[minimumCost] = nodeList
+
+        return minimumCost, costToChildNodeListDict[minimumCost]
+
+    def aoStar(self, v, backTracking):
+
+        print("HEURISTIC VALUES  :", self.H)
+        print("SOLUTION GRAPH    :", self.solutionGraph)
+        print("PROCESSING NODE   :", v)
+        print("-----------------------------------------------------------------------------------------")
+
+        if self.getStatus(v) >= 0:
+            minimumCost, childNodeList = self.computeMinimumCostChildNodes(v)
+            self.setHeuristicNodeValue(v, minimumCost)
+            self.setStatus(v, len(childNodeList))
+
+            solved = True
+            for childNode in childNodeList:
+                self.parent[childNode] = v
+                if self.getStatus(childNode) != -1:
+                    solved = solved & False
+
+            if solved == True:
+                self.setStatus(v, -1)
+                self.solutionGraph[v] = childNodeList
+
+            if v != self.start:
+                self.aoStar(self.parent[v],True)
+            if not backTracking:
+                for childNode in childNodeList:
+                    self.setStatus(childNode, 0) 
+                    self.aoStar(childNode,False)
+
+
+h1 = {'A': 1, 'B': 6, 'C': 2, 'D': 12, 'E': 2, 'F': 1, 'G': 5, 'H': 7, 'I': 7, 'J': 1, 'T': 3}
+graph1 = {
+    'A': [[('B', 1), ('C', 1)], [('D', 1)]],
+    'B': [[('G', 1)], [('H', 1)]],
+    'C': [[('J', 1)]],
+    'D': [[('E', 1), ('F', 1)]],
+    'G': [[('I', 1)]]
+}
+G1 = Graph(graph1, h1, 'A')
+G1.applyAOStar()
+G1.printSolution()
+
+h2 = {'A': 1, 'B': 6, 'C': 12, 'D': 10, 'E': 4, 'F': 4, 'G': 5, 'H': 7}
+graph2 = {
+    'A': [[('B', 1), ('C', 1)], [('D', 1)]],
+    'B': [[('G', 1)], [('H', 1)]],
+    'D': [[('E', 1), ('F', 1)]]
+}
+
+G2 = Graph(graph2, h2, 'A') 
+G2.applyAOStar() 
+G2.printSolution()  <p/>
+        <h2>P4</h2>
+        <p>import pandas as pd
+import math
+import numpy as np
+data=pd.read_csv("3_data.csv")
+features=[feat for feat in data]
+features.remove("Target")
+
+class Node:
+    def __init__(self):
+        self.children = []
+        self.value = ""
+        self.isLeaf = False
+        self.pred = ""
+def entropy(examples):
+    pos = 0.0
+    neg = 0.0
+    for _, row in examples.iterrows():
+        if row["Target"] == "yes":
+            pos += 1
+        else:
+            neg += 1
+    if pos == 0.0 or neg == 0.0:
+         return 0.0
+    else:
+        p = pos / (pos + neg)
+        n = neg / (pos + neg)
+        return -(p * math.log(p, 2) + n * math.log(n, 2))
+def info_gain(examples, attr):
+    uniq = np.unique(examples[attr])
+    gain = entropy(examples)
+    for u in uniq:
+        subdata = examples[examples[attr] == u]
+        sub_e = entropy(subdata)
+        gain -= (float(len(subdata)) / float(len(examples))) * sub_e
+    return gain 
+
+def ID3(examples, attrs):
+    root = Node()
+    max_gain = 0
+    max_feat = ""
+    for feature in attrs:
+        gain = info_gain(examples, feature)
+        if gain > max_gain:
+            max_gain = gain
+            max_feat = feature
+    root.value = max_feat
+    uniq = np.unique(examples[max_feat])
+    for u in uniq:
+        subdata = examples[examples[max_feat] == u]
+        if entropy(subdata) == 0.0:
+            newNode = Node()
+            newNode.isLeaf = True
+            newNode.value = u
+            newNode.pred = np.unique(subdata["Target"])
+            root.children.append(newNode)
+        else:
+            dummyNode = Node()
+            dummyNode.value = u
+            new_attrs = attrs.copy()
+            new_attrs.remove(max_feat)
+            child = ID3(subdata, new_attrs)
+            dummyNode.children.append(child)
+            root.children.append(dummyNode)
+    return root
+
+def printTree(root: Node, depth=0):
+    for i in range(depth):
+        print("\t", end="")
+    print(root.value, end="")
+    if root.isLeaf:
+        print(" -> ", root.pred)
+    print()
+    for child in root.children:
+        printTree(child, depth + 1)
+root = ID3(data, features) 
+printTree(root)</p>
+        <h2>p5</h2>
+        <p>
+import numpy as np
+
+X = np.array(([2, 9], [1, 5], [3, 6]), dtype=float)
+y = np.array(([92], [86], [89]), dtype=float)
+X = X / np.amax(X, axis=0)
+y = y / 100
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+
+def derivatives_sigmoid(x):
+    return x * (1 - x)
+
+
+epoch = 7000 
+lr = 0.1 
+inputlayer_neurons = 2 
+hiddenlayer_neurons = 3 
+output_neurons = 1  
+wh = np.random.uniform(size=(inputlayer_neurons, hiddenlayer_neurons))
+bh = np.random.uniform(size=(1, hiddenlayer_neurons))
+wout = np.random.uniform(size=(hiddenlayer_neurons, output_neurons))
+bout = np.random.uniform(size=(1, output_neurons))
+
+for i in range(epoch):
+    hinp1 = np.dot(X, wh)
+    hinp = hinp1 + bh
+    hlayer_act = sigmoid(hinp)
+    outinp1 = np.dot(hlayer_act, wout)
+    outinp = outinp1 + bout
+    output = sigmoid(outinp)
+   
+    EO = y - output
+    outgrad = derivatives_sigmoid(output)
+    d_output = EO * outgrad
+    EH = d_output.dot(wout.T)
+    hiddengrad = derivatives_sigmoid(hlayer_act)
+    d_hiddenlayer = EH * hiddengrad
+    wout += hlayer_act.T.dot(d_output) * lr
+    
+    wh += X.T.dot(d_hiddenlayer) * lr
+   
+print("Input: \n" + str(X))
+print("Actual Output: \n" + str(y))
+print("Predicted Output: \n", output)</p>
+        <h2>p6</h2>
+        <p>import numpy as np
+import csv
+def read_data(filename):
+    with open(filename,'r') as csvfile:
+        datareader = csv.reader(csvfile)
+        metadata = next(datareader)
+        traindata=[]
+        for row in datareader:
+            traindata.append(row)
+        print(traindata,"\n")
+        print("Metadata is:\n",metadata)
+    return (metadata, traindata)
+def splitDataset(dataset, splitRatio):
+    trainSize = int(len(dataset) * splitRatio)
+    trainset = []
+    testset = list(dataset)
+    i = 0
+    while len(trainset) < trainSize:
+        trainset.append(testset.pop(i))
+    return [trainset, testset]
+def classify(train,test):
+    train_rows = train.shape[0]
+    test_rows = test.shape[0]
+    train_col = train.shape[1]
+    test_col = test.shape[1]
+    print("training data size=",train_rows)
+    print("test data size=",test.shape[0])
+    countYes,countNo,probYes,probNo=0,0,0,0
+    print("target  count   probability")
+    for x in range(train_rows):
+        if train[x,train_col-1]  == 'yes':
+            countYes +=1
+        if train[x,train_col-1]  == 'no':
+            countNo +=1
+    probYes=countYes/train_rows
+    probNo=countNo/train_rows
+    print('Yes',"\t",countYes,"\t",probYes)
+    print('No',"\t",countNo,"\t",probNo)
+    prob0=np.zeros((test_col-1))
+    prob1=np.zeros((test_col-1))
+    accuracy=0
+    for t in range(test_rows):
+        for k in range (test.shape[1]-1):
+            count1,count0=0,0
+            for j in range (train_rows):
+                if test[t,k] == train[j,k] and train[j,train_col-1]=='no':
+                    count0+=1
+                if test[t,k]==train[j,k] and train[j,train_col-1]=='yes':
+                    count1+=1
+            prob0[k]=count0/countNo
+            prob1[k]=count1/countYes
+        probno=probNo
+        probyes=probYes
+        for i in range(test_col-1):
+            probno=probno*prob0[i]
+            probyes=probyes*prob1[i]
+            if probno>probyes:
+                predict='no'
+            else:
+                predict='yes'
+            if predict == test[t,test_col-1]:
+                accuracy+=1
+        final_accuracy=(accuracy/test_rows)*100
+        print("accuracy",final_accuracy,"%")
+        return
+metadata,traindata = read_data("data6.csv")
+splitRatio=0.8
+trainingset, testset=splitDataset(traindata, splitRatio)
+training=np.array(trainingset)
+testing=np.array(testset)
+print("Training :\n",training,"\nTesting: \n",testing)
+classify(training,testing)</p>
+            <h2>p7</h2>
+            <p>import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+df1=pd.read_csv("data8.csv")
+print(df1)
+f1 = df1['Distance_Feature'].values
+f2 = df1['Speeding_Feature'].values
+X = np.matrix(list(zip(f1,f2)))
+plt.plot(1)
+plt.subplot(511)
+plt.xlim([0,100])
+plt.ylim([0,50])
+plt.title('Dataset')
+plt.ylabel('speeding_feature')
+plt.xlabel('distance_feature')
+plt.scatter(f1,f2)
+colors=['b','g','r']
+markers=['o','v','s']
+plt.plot(2)
+ax=plt.subplot(513)
+kmeans_model=KMeans(n_clusters=3).fit(X)
+for i,l in enumerate(kmeans_model.labels_):
+    plt.plot(f1[i],f2[i],color=colors[l],marker=markers[l])
+plt.xlim([0,100])
+plt.ylim([0,50])
+plt.title('K_means')
+plt.ylabel('speeding_feature')
+plt.xlabel('distance_feature')
+plt.plot(3)
+plt.subplot(515)
+gmm=GaussianMixture(n_components=3).fit(X)
+labels=gmm.predict(X)
+for i,l in enumerate(labels):
+    plt.plot(f1[i],f2[i],color=colors[l],marker=markers[l])
+plt.xlim([0,100])
+plt.ylim([0,50])
+plt.title('GaussianMixture')
+plt.ylabel('speeding_feature')
+plt.xlabel('distance_feature')
+plt.show()</p>
+        <h2>p9></h2>
+        <p># -*- coding: utf-8 -*-
+"""
+Created on Thu Jan  6 10:47:51 2022
+
+@author: CS34
+"""
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np1
+def kernel(point,xmat,k):
+    m,n=np1.shape(xmat)
+    weights=np1.mat(np1.eye(m))
+    for j in range(m):
+        diff=point-xmat[j]
+        weights[j,j]=np1.exp(diff*diff.T/(-2.0*k**2))
+    return weights
+def localWeight(point,xmat,ymat,k):
+    wei=kernel(point,xmat,k)
+    W=(xmat.T*(wei*xmat)).I*(xmat.T*(wei*ymat.T))
+    return W
+def localWeightRegression(xmat,ymat,k):
+    row,col=np1.shape(xmat)
+    ypred= np1.zeros(row)
+    for i in range(row):
+        ypred[i]=xmat[i]*localWeight(xmat[i],xmat,ymat,k)
+    return ypred
+data= pd.read_csv('data10.csv')
+bill= np1.array(data.total_bill)
+tip=np1.array(data.tip)
+mbill=np1.mat(bill)
+mtip=np1.mat(tip)
+mbillMatCol=np1.shape(mbill)[1]
+onesArray=np1.mat(np1.ones(mbillMatCol))
+xmat=np1.hstack((onesArray.T,mbill.T))
+ypred=localWeightRegression(xmat,mtip,2)
+SortIndex=xmat[:,1].argsort(0)
+xsort=xmat[SortIndex][:,0]
+fig=plt.figure()
+ax=fig.add_subplot(1,1,1)
+ax.scatter(bill,tip,color='blue')
+ax.plot(xsort[:,1],ypred[SortIndex],color='red',linewidth=1)
+plt.xlabel('Total bill')
+plt.ylabel('tip')
+plt.show();
+        </p>
 </body>
 </html>
