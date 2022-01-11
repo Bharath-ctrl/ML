@@ -365,7 +365,7 @@ def splitDataset(dataset, splitRatio):
     trainset = []
     testset = list(dataset)
     i = 0
-    while len(trainset) < trainSize:
+    while len(trainset) &lt trainSize:
         trainset.append(testset.pop(i))
     return [trainset, testset]
 def classify(train,test):
@@ -404,7 +404,7 @@ def classify(train,test):
         for i in range(test_col-1):
             probno=probno*prob0[i]
             probyes=probyes*prob1[i]
-            if probno>probyes:
+            if probno &gt probyes:
                 predict='no'
             else:
                 predict='yes'
